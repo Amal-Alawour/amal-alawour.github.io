@@ -1,5 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
 
     // =========================================
     // SUPABASE CONNECTION
@@ -8,16 +9,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const supabaseUrl =
         "https://aqhpwoghvuhjovcnmucy.supabase.co";
 
-    const supabaseKey =
-        "sb_publishable_w9rbK_-GBzLFFMMc6YSpKg_K0n__EVl";
+    // Keep your existing Supabase publishable key here.
+    const supabaseKey = "PASTE_YOUR_EXISTING_PUBLISHABLE_KEY_HERE";
 
-    const supabaseClient = window.supabase
-        ? window.supabase.createClient(
-            supabaseUrl,
-            supabaseKey
-        )
-        : null;
-
+    const supabaseClient =
+        window.supabase &&
+        typeof window.supabase.createClient === "function"
+            ? window.supabase.createClient(
+                  supabaseUrl,
+                  supabaseKey
+              )
+            : null;
 
     // =========================================
     // ELEMENTS
@@ -53,7 +55,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentYear =
         document.getElementById("current-year");
 
-
     // =========================================
     // LANGUAGE SYSTEM
     // =========================================
@@ -61,9 +62,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentLanguage =
         localStorage.getItem("language") || "en";
 
+    if (!["en", "ar"].includes(currentLanguage)) {
+        currentLanguage = "en";
+    }
 
     function updateAboutMessage() {
-
         if (!aboutMessage || !aboutButton) {
             return;
         }
@@ -72,24 +75,18 @@ document.addEventListener("DOMContentLoaded", function () {
             aboutMessage.classList.contains("show");
 
         if (isVisible) {
-
             if (currentLanguage === "ar") {
-
                 aboutMessage.textContent =
                     "أجمع بين خبرتي في تقنية المعلومات والدعم الفني والأنظمة الرقمية والتدريب التقني، مع اهتمام بالبرمجة وتحليل البيانات والأتمتة. أركز على تقديم تدريب عملي وحلول تقنية تساعد المستخدمين والمتعلمين على استخدام التقنية بفعالية.";
 
                 aboutButton.textContent = "إخفاء ↑";
-
             } else {
-
                 aboutMessage.textContent =
                     "I combine my experience in IT, technical support, digital systems and technology training with an interest in programming, data analytics and automation. I focus on practical training and technology solutions that help users and learners use technology effectively.";
 
                 aboutButton.textContent = "Show Less ↑";
             }
-
         } else {
-
             aboutMessage.textContent = "";
 
             aboutButton.textContent =
@@ -99,59 +96,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function setLanguage(language) {
+        if (!["en", "ar"].includes(language)) {
+            return;
+        }
 
         currentLanguage = language;
 
         document.documentElement.lang = language;
-
         document.documentElement.dir =
             language === "ar" ? "rtl" : "ltr";
 
-
-        // Language toggle button
-
         if (languageToggle) {
+            languageToggle.textContent =
+                language === "ar" ? "English" : "العربية";
 
-            if (language === "ar") {
-
-                languageToggle.textContent = "English";
-
-                languageToggle.setAttribute(
-                    "aria-label",
-                    "Switch to English"
-                );
-
-            } else {
-
-                languageToggle.textContent = "العربية";
-
-                languageToggle.setAttribute(
-                    "aria-label",
-                    "Switch to Arabic"
-                );
-            }
+            languageToggle.setAttribute(
+                "aria-label",
+                language === "ar"
+                    ? "Switch to English"
+                    : "Switch to Arabic"
+            );
         }
 
+        // Translate elements with data-en and data-ar.
+        document
+            .querySelectorAll("[data-en][data-ar]")
+            .forEach(function (element) {
+                const translatedText =
+                    element.getAttribute("data-" + language);
 
-        // Translate elements
-
-        const translatableElements =
-            document.querySelectorAll("[data-en][data-ar]");
-
-        translatableElements.forEach(function (element) {
-
-            const translatedText =
-                element.getAttribute("data-" + language);
-
-            if (translatedText !== null) {
-                element.textContent = translatedText;
-            }
-        });
-
-
-        // Form placeholders
+                if (translatedText !== null) {
+                    element.textContent = translatedText;
+                }
+            });
 
         const nameInput =
             document.getElementById("name");
@@ -162,43 +140,34 @@ document.addEventListener("DOMContentLoaded", function () {
         const messageInput =
             document.getElementById("message");
 
-
         if (nameInput) {
-
             nameInput.placeholder =
                 language === "ar"
                     ? "اكتب اسمك"
                     : "Your name";
         }
 
-
         if (emailInput) {
-
             emailInput.placeholder =
                 language === "ar"
                     ? "بريدك الإلكتروني"
                     : "your@email.com";
         }
 
-
         if (messageInput) {
-
             messageInput.placeholder =
                 language === "ar"
                     ? "اكتب رسالتك..."
                     : "Write your message...";
         }
 
-
-        // Contact form button
-
         if (contactForm) {
-
             const submitButton =
-                contactForm.querySelector('button[type="submit"]');
+                contactForm.querySelector(
+                    'button[type="submit"]'
+                );
 
-            if (submitButton) {
-
+            if (submitButton && !submitButton.disabled) {
                 submitButton.textContent =
                     language === "ar"
                         ? "إرسال الرسالة"
@@ -206,46 +175,28 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-
-        // Page title
-
         document.title =
             language === "ar"
                 ? "أمل العاوور | تقنية المعلومات والتدريب التقني"
                 : "Amal Alawour | IT & Technology Trainer";
 
-
-        // About section
-
         updateAboutMessage();
 
-
-        // Clear old form status when language changes
-
         if (formMessage) {
-
             formMessage.textContent = "";
-
             formMessage.classList.remove("error");
         }
-
-
-        // Save language
 
         localStorage.setItem("language", language);
     }
 
-
     if (languageToggle) {
-
         languageToggle.addEventListener("click", function () {
-
             setLanguage(
                 currentLanguage === "en" ? "ar" : "en"
             );
         });
     }
-
 
     // =========================================
     // DARK MODE
@@ -254,77 +205,60 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentTheme =
         localStorage.getItem("theme") || "light";
 
+    if (!["light", "dark"].includes(currentTheme)) {
+        currentTheme = "light";
+    }
 
     function setTheme(theme) {
+        if (!["light", "dark"].includes(theme)) {
+            return;
+        }
 
         currentTheme = theme;
 
-        if (theme === "dark") {
+        document.body.classList.toggle(
+            "dark-mode",
+            theme === "dark"
+        );
 
-            document.body.classList.add("dark-mode");
+        if (themeToggle) {
+            themeToggle.textContent =
+                theme === "dark" ? "☀️" : "🌙";
 
-            if (themeToggle) {
+            themeToggle.setAttribute(
+                "aria-label",
+                theme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+            );
 
-                themeToggle.textContent = "☀️";
-
-                themeToggle.setAttribute(
-                    "aria-label",
-                    "Switch to light mode"
-                );
-
-                themeToggle.setAttribute(
-                    "aria-pressed",
-                    "true"
-                );
-            }
-
-        } else {
-
-            document.body.classList.remove("dark-mode");
-
-            if (themeToggle) {
-
-                themeToggle.textContent = "🌙";
-
-                themeToggle.setAttribute(
-                    "aria-label",
-                    "Switch to dark mode"
-                );
-
-                themeToggle.setAttribute(
-                    "aria-pressed",
-                    "false"
-                );
-            }
+            themeToggle.setAttribute(
+                "aria-pressed",
+                theme === "dark" ? "true" : "false"
+            );
         }
 
         localStorage.setItem("theme", theme);
     }
 
-
     if (themeToggle) {
-
         themeToggle.addEventListener("click", function () {
-
             setTheme(
                 currentTheme === "light" ? "dark" : "light"
             );
         });
     }
 
-
     // =========================================
     // MOBILE MENU
     // =========================================
 
     function closeMobileMenu() {
-
         if (!navMenu || !menuToggle) {
             return;
         }
 
         navMenu.classList.remove("active");
-
         menuToggle.classList.remove("active");
 
         menuToggle.setAttribute(
@@ -338,17 +272,17 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
     if (menuToggle && navMenu) {
-
         menuToggle.addEventListener("click", function (event) {
-
             event.stopPropagation();
 
             const isOpen =
                 navMenu.classList.toggle("active");
 
-            menuToggle.classList.toggle("active", isOpen);
+            menuToggle.classList.toggle(
+                "active",
+                isOpen
+            );
 
             menuToggle.setAttribute(
                 "aria-expanded",
@@ -363,45 +297,33 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         });
 
-
-        const navLinks =
-            navMenu.querySelectorAll("a");
-
-        navLinks.forEach(function (link) {
-
+        navMenu.querySelectorAll("a").forEach(function (link) {
             link.addEventListener("click", function () {
                 closeMobileMenu();
             });
         });
-
 
         navMenu.addEventListener("click", function (event) {
             event.stopPropagation();
         });
     }
 
-
     document.addEventListener("click", function () {
         closeMobileMenu();
     });
 
-
     window.addEventListener("resize", function () {
-
         if (window.innerWidth > 820) {
             closeMobileMenu();
         }
     });
-
 
     // =========================================
     // ABOUT - LEARN MORE
     // =========================================
 
     if (aboutButton && aboutMessage) {
-
         aboutButton.addEventListener("click", function () {
-
             const isVisible =
                 aboutMessage.classList.toggle("show");
 
@@ -414,17 +336,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
     // =========================================
-    // CONTACT FORM - SAVE TO SUPABASE
+    // CONTACT FORM - SUPABASE
     // =========================================
 
     if (contactForm) {
-
         contactForm.addEventListener(
             "submit",
             async function (event) {
-
                 event.preventDefault();
 
                 if (!formMessage) {
@@ -432,15 +351,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 formMessage.textContent = "";
-
                 formMessage.classList.remove("error");
 
-                // =========================================
-                // SPAM PROTECTION - HONEYPOT
-                // =========================================
-                const honeypot = document.getElementById("website_check");
+                // Honeypot spam protection.
+                const honeypot =
+                    document.getElementById("website_check");
 
-                if (honeypot && honeypot.value.trim() !== "") {
+                if (
+                    honeypot &&
+                    honeypot.value.trim() !== ""
+                ) {
                     formMessage.textContent =
                         currentLanguage === "ar"
                             ? "تعذر إرسال الرسالة."
@@ -450,22 +370,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                // Check Supabase connection
-
+                // Check Supabase availability.
                 if (!supabaseClient) {
-
                     formMessage.textContent =
                         currentLanguage === "ar"
                             ? "تعذر الاتصال بخدمة حفظ الرسائل. يرجى تحديث الصفحة والمحاولة مرة أخرى."
                             : "The message service is unavailable. Please refresh the page and try again.";
 
                     formMessage.classList.add("error");
-
                     return;
                 }
-
-
-                // Read form fields
 
                 const nameInput =
                     document.getElementById("name");
@@ -481,7 +395,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const serviceTypeInput =
                     document.getElementById("service_type");
-
 
                 const name =
                     nameInput ? nameInput.value.trim() : "";
@@ -500,24 +413,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         ? serviceTypeInput.value.trim()
                         : "General inquiry";
 
-
-                // Validate required fields
-
+                // Required fields.
                 if (!name || !email || !message) {
-
                     formMessage.textContent =
                         currentLanguage === "ar"
                             ? "يرجى تعبئة الاسم والبريد الإلكتروني والرسالة."
                             : "Please enter your name, email address, and message.";
 
                     formMessage.classList.add("error");
-
                     return;
                 }
 
-
-                // Validate field lengths
-
+                // Field length limits.
                 if (
                     name.length > 100 ||
                     email.length > 254 ||
@@ -525,82 +432,60 @@ document.addEventListener("DOMContentLoaded", function () {
                     phone.length > 30 ||
                     serviceType.length > 100
                 ) {
-
                     formMessage.textContent =
                         currentLanguage === "ar"
                             ? "بعض الحقول أطول من الحد المسموح. يرجى تقصير النص والمحاولة مجددًا."
                             : "One or more fields exceed the allowed length. Please shorten them and try again.";
 
                     formMessage.classList.add("error");
-
                     return;
                 }
 
-
-                // Validate email
-
+                // Basic email validation.
                 const emailPattern =
                     /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
                 if (!emailPattern.test(email)) {
-
                     formMessage.textContent =
                         currentLanguage === "ar"
                             ? "يرجى إدخال بريد إلكتروني صحيح."
                             : "Please enter a valid email address.";
 
                     formMessage.classList.add("error");
-
                     return;
                 }
-
-
-                // Prepare data for the database
 
                 const requestData = {
                     name: name,
                     email: email,
                     phone: phone || null,
-                    service_type: serviceType || "General inquiry",
+                    service_type:
+                        serviceType || "General inquiry",
                     message: message
                 };
 
-
-                // Disable the button while submitting
-
                 const submitButton =
-                    contactForm.querySelector('button[type="submit"]');
-
-                const originalButtonText =
-                    submitButton ? submitButton.textContent : "";
+                    contactForm.querySelector(
+                        'button[type="submit"]'
+                    );
 
                 if (submitButton) {
-
                     submitButton.disabled = true;
-
                     submitButton.textContent =
                         currentLanguage === "ar"
                             ? "جارٍ الإرسال..."
                             : "Sending...";
                 }
 
-
                 try {
-
-                    // Insert only; do not request database rows
-
                     const { error } =
                         await supabaseClient
                             .from("customer_requests")
                             .insert([requestData]);
 
-
                     if (error) {
                         throw error;
                     }
-
-
-                    // Show success only after the database accepts it
 
                     formMessage.classList.remove("error");
 
@@ -609,14 +494,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             ? "تم إرسال رسالتك بنجاح. شكرًا لتواصلك معنا!"
                             : "Your message was submitted successfully. Thank you for contacting us!";
 
-
                     contactForm.reset();
 
-
-                    // Restore translated placeholders and button
-
+                    // Restore placeholders after resetting the form.
                     if (nameInput) {
-
                         nameInput.placeholder =
                             currentLanguage === "ar"
                                 ? "اكتب اسمك"
@@ -624,7 +505,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     if (emailInput) {
-
                         emailInput.placeholder =
                             currentLanguage === "ar"
                                 ? "بريدك الإلكتروني"
@@ -632,15 +512,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     if (messageInput) {
-
                         messageInput.placeholder =
                             currentLanguage === "ar"
                                 ? "اكتب رسالتك..."
                                 : "Write your message...";
                     }
-
                 } catch (error) {
-
                     console.error(
                         "Supabase submission error:",
                         error
@@ -652,11 +529,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         currentLanguage === "ar"
                             ? "لم نتمكن من حفظ الرسالة. يرجى المحاولة مرة أخرى."
                             : "We could not save your message. Please try again.";
-
                 } finally {
-
                     if (submitButton) {
-
                         submitButton.disabled = false;
 
                         submitButton.textContent =
@@ -669,25 +543,18 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
     // =========================================
     // SCROLL TO TOP
     // =========================================
 
     if (scrollTopButton) {
-
         function updateScrollButton() {
-
             if (window.scrollY > 500) {
-
                 scrollTopButton.classList.add("show");
-
             } else {
-
                 scrollTopButton.classList.remove("show");
             }
         }
-
 
         window.addEventListener(
             "scroll",
@@ -695,37 +562,29 @@ document.addEventListener("DOMContentLoaded", function () {
             { passive: true }
         );
 
-
         scrollTopButton.addEventListener("click", function () {
-
             window.scrollTo({
                 top: 0,
                 behavior: "smooth"
             });
         });
 
-
         updateScrollButton();
     }
-
 
     // =========================================
     // CURRENT YEAR
     // =========================================
 
     if (currentYear) {
-
         currentYear.textContent =
             new Date().getFullYear();
     }
-
 
     // =========================================
     // INITIAL SETTINGS
     // =========================================
 
     setLanguage(currentLanguage);
-
     setTheme(currentTheme);
-
 });
