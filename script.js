@@ -435,6 +435,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 formMessage.classList.remove("error");
 
+                // =========================================
+                // SPAM PROTECTION - HONEYPOT
+                // =========================================
+                const honeypot = document.getElementById("website_check");
+
+                if (honeypot && honeypot.value.trim() !== "") {
+                    formMessage.textContent =
+                        currentLanguage === "ar"
+                            ? "تعذر إرسال الرسالة."
+                            : "Unable to submit the message.";
+
+                    formMessage.classList.add("error");
+                    return;
+                }
 
                 // Check Supabase connection
 
