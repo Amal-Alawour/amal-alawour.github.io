@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://aqhpwoghvuhjovcnmucy.supabase.co";
 
     // Keep your existing Supabase publishable key here.
-    const supabaseKey = "PASTE_YOUR_EXISTING_PUBLISHABLE_KEY_HERE";
+    const supabaseKey = "sb_publishable_w9rbK_-GBzLFFMMc6YSpKg_K0n__EVl";
 
     const supabaseClient =
         window.supabase &&
